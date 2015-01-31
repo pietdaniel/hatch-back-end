@@ -4,19 +4,20 @@
 
 #### Backend:
 - Flask, headless REST api. 
+
 #### Frontend:
 - D3, ember.js
 
 ## Roles and Responsibilites:
 - dj: front end, documentation
 - spleensauce: front end, test automation
--  pietdaniel: back end, deploys
-- ali: icons, assets
-- isaac: <place claim here>
+- pietdaniel: back end, deploys
+- ali: icons, assets, travis, AWS
+- isaac: \<place claim here\>
 
 
 ## Requirements:
-- <TODO>
+- TODO
 
 ## Features:
 - Queries
@@ -29,7 +30,3 @@
 - Start developing
 - ???
 - profit
-
-  
-
-
