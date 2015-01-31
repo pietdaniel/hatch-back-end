@@ -3,5 +3,5 @@ server/ENVVAR
 ./server/neuhatch/__pycache__/*
 ./server/neuhatch/__pycache__
 *.pyc
-./server/migrations
+./server/migrations/
 ./server/migrations/*
