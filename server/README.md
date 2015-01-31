@@ -23,6 +23,7 @@
 # setup
 
 ### set up postgres
+
  - for mac users: http://postgresapp.com/
  - for arch users: https://wiki.archlinux.org/index.php/PostgreSQL
 
@@ -74,6 +75,23 @@ Then run:
 
 ```
 source ENVVAR
+```
+
+###  initialize database and migrate the models
+
+using ```manage.py``` initialize the database and migrate the models
+
+```
+python manage.py db init
+python manage.py db migrate
+python manage.py db upgrade
+```
+
+you can verify the models exist in postgres like so:
+
+```
+psql -d neuhatch
+neuhatch=# \dt
 ```
 
 # run
