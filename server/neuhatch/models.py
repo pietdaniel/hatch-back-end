@@ -6,11 +6,22 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String())
+    access_token = db.Column(db.String())
+    access_token_secret = db.Column(db.String())
 
-    def __init__(self, username):
+    def __init__(self, username, access_token, access_token_secret):
         self.username = username
+        self.access_token = access_token
+        self.access_token_secret = access_token_secret
+
+    def serialize(self):
+        return {
+                "id": self.id,
+                "username" : self.username
+                }
+
 
     def __repr__(self):
-        return '<id {}>.'.format(self.id)
+        return '<id {}>.<username {}>'.format(self.id, self.username)
 
 

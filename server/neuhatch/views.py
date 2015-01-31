@@ -1,6 +1,15 @@
-import tweepy, sys
+import tweepy, sys, json
 from flask import redirect, session, request, url_for
 from neuhatch import config, app
+from neuhatch.models import User
+
+@app.route("/users")
+def users():
+    users = User.query.all()
+    out = []
+    for user in users:
+        out.append(user.serialize())
+    return json.dumps(out)
 
 @app.route("/oauth")
 def oauth():
@@ -33,6 +42,9 @@ def callback():
         secret = auth.access_token_secret
         auth.set_access_token(key, secret)
         api = tweepy.API(auth)
+        u = User("test", key, secret)
+        db.session.add(u)
+        db.session.commit()
         return str(api.me())
     except:
         return str(sys.exc_info())
