@@ -12,7 +12,7 @@
 - dj: front end, documentation
 - spleensauce: front end, test automation
 - pietdaniel: back end, deploys
-- ali: icons, assets, travis, AWS
+- ali: front end, back end, CI
 - isaac: \<place claim here\>
 
 
