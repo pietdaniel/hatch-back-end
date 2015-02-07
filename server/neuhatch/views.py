@@ -1,6 +1,6 @@
 import tweepy, sys, json
 from flask import redirect, session, request, url_for
-from neuhatch import config, app
+from neuhatch import config, app, db
 from neuhatch.models import User
 
 @app.route("/users")
