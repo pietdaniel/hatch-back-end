@@ -2,16 +2,17 @@ App = Ember.Application.create();
 
 App.Router.map(function() {
   this.resource('query');
-
   this.resource('tweets', function() {
     this.resource('tweet', {path: ':id'});
   });
-
 });
+
 
 App.TweetsRoute = Ember.Route.extend({
   model: function() {
-    return statuses;
+    return $.getJSON("http://localhost:5000/search", function(data) {
+      return data;
+    });
   }
 });
 
@@ -28,12 +29,11 @@ App.TweetRoute = Ember.Route.extend({
   }
 });
 
-
 Ember.Handlebars.helper('format-date', function(date) {
   return moment(date).fromNow();
 });
 
-var statuses = $.getJSON("js/tweet_test.json", function(data) {
+var tweet_test = $.getJSON("js/tweet_test.json", function(data) {
   return data;
 });
 

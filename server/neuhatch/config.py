@@ -13,6 +13,7 @@ class Config:
         self.access_token_secret = None
         self.app_secret = None
         self.database_url = None
+        self.hostname = "http://localhost:8000/"
     def environ_set(self):
         self.set_with_warning("consumer_key")
         self.set_with_warning("consumer_secret")

@@ -1,5 +1,4 @@
 # todo
-- postgres
 - api requirements
 - api specification
 - models
@@ -8,6 +7,7 @@
 
 # done
 - basic oauth support
+- search endpoint
 
 # dependencies
 
