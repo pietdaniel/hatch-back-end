@@ -44,6 +44,8 @@
  - probably could have a better pattern here
 
 ### Frontend
-- really simple boilerplate with ember/bootstrap
-- if a user login the key is used server side to run a query in the the tweets route
-- a lot to do here but next is setting up a sane authentication/authorization scheme client side
+
+- updated 2.15.15, search works
+- todo : session management
+
+
