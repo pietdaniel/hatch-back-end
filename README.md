@@ -32,6 +32,10 @@
 
 ## Current Status
 
+9.15.15
+- server side pass one done with Flask-Login
+- going to need to set up nginx from here on out, this will go server side
+
 ### Backend
 
 - oauth 1.1 has been implemented

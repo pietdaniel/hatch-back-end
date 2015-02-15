@@ -14,6 +14,18 @@ class User(db.Model):
         self.access_token = access_token
         self.access_token_secret = access_token_secret
 
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return unicode(self.id)
+
     def serialize(self):
         return {
                 "id": self.id,

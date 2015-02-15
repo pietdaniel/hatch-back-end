@@ -1,8 +1,13 @@
 import tweepy, sys, json
 from flask import redirect, session, request, url_for, jsonify, Response, request
-from neuhatch import config, app, db
+from flask.ext.login import logout_user, login_user, login_required, current_user
+from neuhatch import config, app, db, login_manager
 from neuhatch.models import User
 from neuhatch.crossdomain import crossdomain
+
+@login_manager.user_loader
+def load_user(userid):
+    return User.query.filter_by(id=userid).first()
 
 @app.route("/users")
 def users():
@@ -35,27 +40,33 @@ def callback():
         auth.request_token = token
         verifier = request.args.get('oauth_verifier')
     except:
+        print "error getting auth verifier or request_token"
         return str(sys.exc_info())
 
-    try:
-        auth.get_access_token(verifier)
-        key = auth.access_token
-        secret = auth.access_token_secret
-        auth.set_access_token(key, secret)
-        api = tweepy.API(auth)
+    auth.get_access_token(verifier)
+    key = auth.access_token
+    secret = auth.access_token_secret
+    auth.set_access_token(key, secret)
+    api = tweepy.API(auth)
 
-        u = User("test", key, secret)
-        db.session.add(u)
-        db.session.commit()
+    u = User("test", key, secret)
+    db.session.add(u)
+    db.session.commit()
 
-        return redirect(config.hostname)
+    login_user(u)
+
+    return redirect(config.hostname)
 
 
-    except:
-        return str(sys.exc_info())
+@app.route('/user')
+@login_required
+def user():
+    return str((current_user.id, current_user.access_token, current_user.access_token_secret))
+
 
 @app.route('/search')
 @crossdomain(origin='*')
+@login_required
 def search():
     user = User.query.filter_by(username="test").first()
 
@@ -66,7 +77,6 @@ def search():
     api = tweepy.API(auth)
 
     query = request.args.get('q')
-    print query
 
     results = api.search(q=query)
     output = []

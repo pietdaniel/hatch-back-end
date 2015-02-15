@@ -3,3 +3,4 @@ tweepy
 psycopg2
 Flask-SQLAlchemy
 Flask-Migrate
+Flask-Login
