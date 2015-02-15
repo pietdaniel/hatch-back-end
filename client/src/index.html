@@ -14,7 +14,7 @@
         <div class="navbar-inner">
           <a class="brand" href="#">Hatch</a>
           <ul class="nav">
-            <li>{{#link-to 'query'}}Query{{/link-to}}</li>
+            <li>{{#link-to 'search'}}Search{{/link-to}}</li>
             <li>{{#link-to 'tweets'}}Tweets{{/link-to}}</li>
             <li><a href="http://localhost:5000/oauth">login</a></li>
           </ul>
@@ -24,8 +24,14 @@
        {{outlet}}
     </script>
 
-    <script type="text/x-handlebars" id="query">
-     <p>{{input type="text" value=query}}</p>
+    <script type="text/x-handlebars" id="search">
+     <p>
+      <form>
+        {{input type="text" value=search }}
+        <input type="submit" value="Search" {{action 'query'}}>
+      </form>
+     </p>
+     {{outlet}}
     </script>
 
     <script type="text/x-handlebars" id="tweet">
@@ -41,10 +47,10 @@
            <thead>
              <tr><th>Recent Tweets</th></tr>
            </thead>
-           {{#each}}
+           {{#each tweet in model.result}}
            <tr><td>
-           {{#link-to 'tweet' this}}
-               {{title}} <small class='muted'> by {{user.name}}</small>
+           {{#link-to 'tweet' tweet}}
+               {{tweet.title}} <small class='muted'> by {{tweet.user.name}}</small>
            {{/link-to}}
            </td></tr>
            {{/each}}

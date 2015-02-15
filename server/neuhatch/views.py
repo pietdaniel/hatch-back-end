@@ -1,5 +1,5 @@
 import tweepy, sys, json
-from flask import redirect, session, request, url_for, jsonify, Response
+from flask import redirect, session, request, url_for, jsonify, Response, request
 from neuhatch import config, app, db
 from neuhatch.models import User
 from neuhatch.crossdomain import crossdomain
@@ -65,7 +65,10 @@ def search():
     auth.set_access_token(key, secret)
     api = tweepy.API(auth)
 
-    results = api.search(q="hacking")
+    query = request.args.get('q')
+    print query
+
+    results = api.search(q=query)
     output = []
     for result in results:
         output.append(result._json)
