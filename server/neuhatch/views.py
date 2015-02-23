@@ -9,6 +9,7 @@ from neuhatch.crossdomain import crossdomain
 def load_user(userid):
     return User.query.filter_by(id=userid).first()
 
+
 @app.route("/users")
 def users():
     users = User.query.all()
@@ -16,6 +17,7 @@ def users():
     for user in users:
         out.append(user.serialize())
     return json.dumps(out)
+
 
 @app.route("/oauth")
 def oauth():
@@ -40,20 +42,24 @@ def callback():
         auth.request_token = token
         verifier = request.args.get('oauth_verifier')
     except:
-        print "error getting auth verifier or request_token"
+        print("error getting auth verifier or request_token")
         return str(sys.exc_info())
 
     auth.get_access_token(verifier)
     key = auth.access_token
     secret = auth.access_token_secret
     auth.set_access_token(key, secret)
+
     api = tweepy.API(auth)
-
-    u = User("test", key, secret)
-    db.session.add(u)
-    db.session.commit()
-
-    login_user(u)
+    username = api.me().screen_name
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        user = User(username, key, secret)
+        print("Creating user %s: %s" % (username, user,))
+        db.session.add(user)
+        db.session.commit()
+    print("Logging in user %s" % user)
+    login_user(user)
 
     return redirect(config.hostname)
 
@@ -84,10 +90,3 @@ def search():
         output.append(result._json)
     out_json = json.dumps(output)
     return Response(out_json, mimetype="application/json")
-
-
-def get_default_api():
-    auth = tweepy.OAuthHandler(config.consumer_key, config.consumer_secret)
-    auth.set_access_token(config.access_token, config.access_token_secret)
-    api = tweepy.API(auth)
-    return api
