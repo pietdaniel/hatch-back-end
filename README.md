@@ -9,7 +9,7 @@
 - spleensauce: front end, test automation
 - pietdaniel: back end, deploys
 - ali: front end, back end, CI
-- isaac: \<place claim here\>
+- isaac: ops, back end, security
 
 ## Current Status
 
@@ -78,8 +78,14 @@
 
 ### set up virtualenv
 
-http://docs.python-guide.org/en/latest/dev/virtualenvs/ 
+http://docs.python-guide.org/en/latest/dev/virtualenvs/
 
+#### Install
+```
+pip install virtualenvwrapper
+```
+
+#### Source and Create
 ```
 source /usr/bin/virtualenvwrapper.sh
 mkvirtualenv -p /usr/bin/python2 neuhatch
@@ -90,6 +96,8 @@ mkvirtualenv -p /usr/bin/python2 neuhatch
 ```
 pip install -r requirements.txt
 ```
+
+Note: I had issues installing on Mac osx 10.8 within a virtualenv, but installing globally worked fine
 
 ### export environment variables
 
@@ -134,5 +142,5 @@ neuhatch=# \dt
 # run
 
 ```
-./server/runserver.py
+./runserver.py
 ```
