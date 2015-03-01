@@ -8,17 +8,28 @@ import neuhatch.utils as utils
 
 @login_manager.user_loader
 def load_user(userid):
+    """
+      required by flask-login
+    """
     return User.query.filter_by(id=userid).first()
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return utils.json_response({'message':'logout succesful'})
 
 @app.route("/users")
 @login_required
 def users():
+    """
+      an endpoint for debugging
+    """
     users = User.query.all()
     out = []
     for user in users:
         out.append(user.serialize())
-    return json.dumps(out)
-
+    return utils.json_response(out)
 
 @app.route("/oauth")
 def oauth():
@@ -63,26 +74,29 @@ def callback():
     print("Logging in user %s" % user)
     login_user(user)
 
-    return redirect(config.hostname)
-
+    return utils.json_response({'message':'login succesful'})
 
 @app.route('/user')
 @login_required
 def user():
-    return str((current_user.id, current_user.access_token, current_user.access_token_secret))
+    """
+      returns user object
+    """
+    return utils.json_response({'id':current_user.id, 'username': current_user.username})
 
 @app.route('/search')
 @crossdomain(origin='*')
 @login_required
 def search():
-    # TODO: used logged in user
-    user = User.query.filter_by(username="test").first()
-    api = utils.get_user_api(user)
+    """
+      twitter search endpoint
+      search?q={Query}
+    """
+    api = utils.get_user_api(current_user)
     query = request.args.get('q')
     results = api.search(q=query)
     output = []
     for result in results:
         output.append(result._json)
-    out_json = json.dumps(output)
+    return utils.json_response(output)
 
-    return Response(out_json, mimetype="application/json")

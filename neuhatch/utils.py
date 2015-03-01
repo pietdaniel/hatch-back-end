@@ -1,3 +1,4 @@
+from flask import Response
 import tweepy, sys, json
 from flask.ext.login import logout_user, logout_user, login_required, current_user
 from neuhatch import config, app, db, login_manager
@@ -29,3 +30,7 @@ def get_user_api(user):
     secret = user.access_token_secret
     auth.set_access_token(key, secret)
     return tweepy.API(auth)
+
+def json_response(data):
+    out_json = json.dumps(data)
+    return Response(out_json, mimetype='application/json')
