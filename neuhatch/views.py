@@ -34,13 +34,9 @@ def users():
 @app.route("/oauth")
 def oauth():
     try:
-        # TODO: abstract callback url to config
-        callback_url = "%s%s" % ("http://localhost:5000", url_for("callback"))
-        # create initial tweepy callback object
-        auth = utils.get_base_auth()
-        # get redirect url
+        callback_url = "%s%s" % (config.hostname, url_for("callback"))
+        auth = utils.get_base_auth(callback_url)
         redirect_url = auth.get_authorization_url()
-        # set request token
         session['request_token'] = auth.request_token
         return redirect(redirect_url)
     except tweepy.TweepError as e:
@@ -99,4 +95,3 @@ def search():
     for result in results:
         output.append(result._json)
     return utils.json_response(output)
-

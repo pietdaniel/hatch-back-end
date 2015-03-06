@@ -13,7 +13,8 @@ class Config:
         self.access_token_secret = None
         self.app_secret = None
         self.database_url = None
-        self.hostname = "http://localhost:5000/"
+        self.hostname = "http://localhost:5000"
+
     def environ_set(self):
         self.set_with_warning("consumer_key")
         self.set_with_warning("consumer_secret")
@@ -27,5 +28,3 @@ class Config:
         setattr(self, var, val)
         if getattr(self, var) is None:
             print "Warning %s is None" % var
-
-
