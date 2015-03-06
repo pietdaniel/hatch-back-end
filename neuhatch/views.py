@@ -1,10 +1,9 @@
 import tweepy, sys, json
 from flask import redirect, session, request, url_for, jsonify, Response, request
 from flask.ext.login import logout_user, login_user, login_required, current_user
-from neuhatch import config, app, db, login_manager
+from neuhatch import config, app, db, login_manager, utils
 from neuhatch.models import User
 from neuhatch.crossdomain import crossdomain
-import neuhatch.utils as utils
 
 @login_manager.user_loader
 def load_user(userid):
@@ -33,12 +32,15 @@ def users():
 
 @app.route("/oauth")
 def oauth():
+    if not current_user.is_anonymous():
+        return redirect(url_for('user'))
+
     try:
-        callback_url = "%s%s" % (config.hostname, url_for("callback"))
-        auth = utils.get_base_auth(callback_url)
-        redirect_url = auth.get_authorization_url()
+        auth = utils.get_base_auth(
+            callback = config.hostname + url_for('callback'))
+        authorization_url = auth.get_authorization_url()
         session['request_token'] = auth.request_token
-        return redirect(redirect_url)
+        return redirect(authorization_url)
     except tweepy.TweepError as e:
         return 'Failed to get request token %s' % e
     except:

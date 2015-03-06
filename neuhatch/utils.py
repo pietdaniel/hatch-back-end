@@ -3,9 +3,9 @@ import tweepy, sys, json
 from flask.ext.login import logout_user, logout_user, login_required, current_user
 from neuhatch import config, app, db, login_manager
 
-def get_base_auth(callback_url = None):
+def get_base_auth(callback = None):
     return tweepy.OAuthHandler(
-        config.consumer_key, config.consumer_secret, callback_url)
+        config.consumer_key, config.consumer_secret, callback = callback)
 
 def verify_api(request_token, verifier):
     """
