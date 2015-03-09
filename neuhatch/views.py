@@ -72,7 +72,7 @@ def callback():
     print("Logging in user %s" % user)
     login_user(user)
 
-    return utils.json_response({'message':'login succesful'})
+    return redirect('http://localhost:8080', code=302)
 
 @app.route('/user')
 @login_required
