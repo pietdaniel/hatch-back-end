@@ -1,7 +1,7 @@
 import tweepy, sys, json
 from flask import redirect, session, request, url_for, jsonify, Response, request
 from flask.ext.login import logout_user, login_user, login_required, current_user
-from neuhatch import config, app, db, login_manager, utils
+from neuhatch import app, db, login_manager, utils
 from neuhatch.models import User
 from neuhatch.crossdomain import crossdomain
 
@@ -37,7 +37,7 @@ def oauth():
 
     try:
         auth = utils.get_base_auth(
-            callback = config.hostname + url_for('callback'))
+            callback = app.config['HOSTNAME'] + url_for('callback'))
         authorization_url = auth.get_authorization_url()
         session['request_token'] = auth.request_token
         return redirect(authorization_url)
