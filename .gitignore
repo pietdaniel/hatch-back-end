@@ -5,3 +5,4 @@ ENVVAR
 *.pyc
 /migrations
 /migrations/*
+/instance

@@ -32,8 +32,5 @@ class User(db.Model):
                 "username" : self.username
                 }
 
-
     def __repr__(self):
         return '<id {}>.<username {}>'.format(self.id, self.username)
-
-

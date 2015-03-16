@@ -5,9 +5,6 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 from flask.ext.login import LoginManager
 
-from neuhatch.config import get_default_config
-
-
 def make_json_app(import_name, **kwargs):
     """
     Creates a JSON-oriented Flask app.
@@ -19,19 +16,20 @@ def make_json_app(import_name, **kwargs):
     { "message": "405: Method Not Allowed" }
     http://flask.pocoo.org/snippets/83/
     """
+    app = Flask(import_name, instance_relative_config=True, **kwargs)
+    app.config.from_pyfile('application.cfg', silent=False)
+
     def make_json_error(ex):
         response = jsonify(message=str(ex))
         response.status_code = (ex.code if isinstance(ex, HTTPException) else 500)
         return response
-    app = Flask(import_name, **kwargs)
+
     for code in default_exceptions.iterkeys():
         app.error_handler_spec[None][code] = make_json_error
+
     return app
 
-config = get_default_config()
 app = make_json_app(__name__)
-app.secret_key = config.app_secret
-app.config["SQLALCHEMY_DATABASE_URI"] = config.database_url
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
