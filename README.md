@@ -95,6 +95,7 @@ mkvirtualenv -p /usr/bin/python2 neuhatch
 
 ```
 pip install -r requirements.txt
+pip install -r dev-requirements.txt
 ```
 
 Note: I had issues installing on Mac osx 10.8 within a virtualenv, but installing globally worked fine
