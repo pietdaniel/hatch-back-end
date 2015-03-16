@@ -1,5 +1,6 @@
 from flask.ext.testing import TestCase
 from neuhatch import app, db
+from flask.ext.login import current_user
 
 
 class HatchTestCase(TestCase):
@@ -20,6 +21,9 @@ class HatchTestCase(TestCase):
 
 class OAuthTests(HatchTestCase):
     """Test cases for our application's OAuth flow."""
+    def test_no_default_authenticated_user(self):
+        with app.test_request_context('/oauth'):
+            assert current_user.is_anonymous()
 
     def test_oauth_flow_redirects_to_twitter(self):
         response = self.client.get('/oauth')
