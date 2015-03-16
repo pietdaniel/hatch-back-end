@@ -53,7 +53,7 @@
 - http://tweepy.readthedocs.org/en/v3.2.0/index.html
 - https://flask.pocoo.org/
 - http://initd.org/psycopg/
-- http://www.sqlalchemy.org/http://www.sqlalchemy.org/
+- http://www.sqlalchemy.org/
 - http://flask-migrate.readthedocs.org/en/latest/
 
 
@@ -127,3 +127,10 @@ neuhatch=# \dt
 ```
 ./runserver.py
 ```
+
+# test:
+
+Install the development requirements:
+
+    $ pip install -r dev-requirements.txt
+    $ nosetests
