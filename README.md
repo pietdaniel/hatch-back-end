@@ -8,7 +8,7 @@
 - dj: front end, documentation
 - spleensauce: front end, test automation
 - pietdaniel: back end, deploys
-- ali: front end, back end, CI
+- ali: front end, back end
 - isaac: ops, back end, security
 
 ## Current Status
@@ -99,28 +99,11 @@ pip install -r requirements.txt
 
 Note: I had issues installing on Mac osx 10.8 within a virtualenv, but installing globally worked fine
 
-### export environment variables
+### Configure the application
 
-in order to keep our keys secret, an environment variable file will need to be created.
+Modify the configuration file in ```/instance/application.cfg```.
 
-Call this file ```ENVVAR``` and place it in ```server/```
-
-Its format is as follows:
-
-```
-export consumer_key="PLACEHOLDER"
-export consumer_secret="PLACEHOLDER"
-export access_token="PLACEHOLDER"
-export access_token_secret="PLACEHOLDER"
-export app_secret="PLACEHOLDER"
-export database_url="postgres://localhost/neuhatch"
-```
-
-Then run:
-
-```
-source ENVVAR
-```
+How to generate the app's secret key (used for securing sessions): see ["How to generate good secret keys"](http://flask.pocoo.org/docs/0.10/quickstart/#sessions).
 
 ###  initialize database and migrate the models
 
