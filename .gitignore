@@ -6,3 +6,4 @@ ENVVAR
 /migrations
 /migrations/*
 /instance
+/instance/application.cfg
