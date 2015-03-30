@@ -1,22 +1,24 @@
-import tweepy, sys, json
-from flask import redirect, session, request, url_for, jsonify, Response, request
+import tweepy
+import sys
+from flask import redirect, session, request, url_for, jsonify, Response
 from flask.ext.login import logout_user, login_user, login_required, current_user
 from neuhatch import app, db, login_manager, utils
 from neuhatch.models import User
 from neuhatch.crossdomain import crossdomain
 
+
 @login_manager.user_loader
 def load_user(userid):
-    """
-      required by flask-login
-    """
+    """ Return a user by their id. Required by flask.ext.login. """
     return User.query.filter_by(id=userid).first()
+
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return utils.json_response({'message':'logout succesful'})
+    return utils.json_response({'message': 'logout succesful'})
+
 
 @app.route("/users")
 @login_required
@@ -30,6 +32,7 @@ def users():
         out.append(user.serialize())
     return utils.json_response(out)
 
+
 @app.route("/oauth")
 def oauth():
     if not current_user.is_anonymous():
@@ -37,7 +40,7 @@ def oauth():
 
     try:
         auth = utils.get_base_auth(
-            callback = app.config['HOSTNAME'] + url_for('callback'))
+            callback=(app.config['HOSTNAME'] + url_for('callback')))
         authorization_url = auth.get_authorization_url()
         session['request_token'] = auth.request_token
         return redirect(authorization_url)
@@ -46,6 +49,7 @@ def oauth():
     except:
         # todo error handling
         return str(sys.exc_info())
+
 
 @app.route('/callback')
 def callback():
@@ -74,26 +78,34 @@ def callback():
 
     return redirect('http://localhost:8080', code=302)
 
+
 @app.route('/user')
 @login_required
 def user():
     """
-      returns user object
+    Return the logged in user.
     """
-    return utils.json_response({'id':current_user.id, 'username': current_user.username})
+    return utils.json_response({
+        'id': current_user.id,
+        'username': current_user.username
+    })
+
 
 @app.route('/search')
 @crossdomain(origin='*')
 @login_required
-def search():
-    """
-      twitter search endpoint
-      search?q={Query}
+def search(MAX_RESULTS=1000):
+    """ Return search results (Tweets) from Twitter for the given query.
+    GET /search?q=:query
+
+    Args:
+        max_results -- Integer, the most tweets to return
     """
     api = utils.get_user_api(current_user)
     query = request.args.get('q')
-    results = api.search(q=query)
-    output = []
-    for result in results:
-        output.append(result._json)
-    return utils.json_response(output)
+    COUNT = 100  # Tweets per page
+    results = []
+    for page in tweepy.Cursor(api.search, q=query, count=COUNT).pages(
+                MAX_RESULTS/COUNT):
+        results.extend([tweet._json for tweet in page])
+    return utils.json_response(results)
