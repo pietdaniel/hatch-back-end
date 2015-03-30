@@ -77,7 +77,7 @@ def callback():
     print("Logging in user %s" % user)
     login_user(user)
 
-    return redirect('http://localhost:8080', code=302)
+    return redirect(app.config['FRONTEND'], code=302)
 
 
 @app.route('/user')
