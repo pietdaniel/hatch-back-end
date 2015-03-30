@@ -1,7 +1,8 @@
 import tweepy
 import sys
-from flask import redirect, session, request, url_for, jsonify, Response
-from flask.ext.login import logout_user, login_user, login_required, current_user
+from flask import redirect, session, request, url_for
+from flask.ext.login import (
+    current_user, logout_user, login_user, login_required)
 from neuhatch import app, db, login_manager, utils
 from neuhatch.models import User
 from neuhatch.crossdomain import crossdomain
@@ -24,7 +25,7 @@ def logout():
 @login_required
 def users():
     """
-      an endpoint for debugging
+    Return a list of all users.
     """
     users = User.query.all()
     out = []
