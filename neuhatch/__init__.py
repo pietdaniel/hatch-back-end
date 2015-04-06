@@ -14,7 +14,9 @@ def make_json_app(import_name, **kwargs):
     type, and will contain JSON like this (just an example):
 
     { "message": "405: Method Not Allowed" }
-    http://flask.pocoo.org/snippets/83/
+
+    Adapted from Pavel Repin's "Specialized JSON-oriented Flask App":
+        http://flask.pocoo.org/snippets/83/
     """
     app = Flask(import_name, instance_relative_config=True, **kwargs)
     app.config.from_pyfile('application.cfg', silent=False)
