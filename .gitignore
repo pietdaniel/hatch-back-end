@@ -3,7 +3,5 @@ ENVVAR
 ./neuhatch/__pycache__/*
 ./neuhatch/__pycache__
 *.pyc
-/migrations
-/migrations/*
 /instance
 /instance/application.cfg

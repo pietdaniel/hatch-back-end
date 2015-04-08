@@ -111,8 +111,6 @@ How to generate the app's secret key (used for securing sessions): see ["How to 
 using ```manage.py``` initialize the database and migrate the models
 
 ```
-python manage.py db init
-python manage.py db migrate
 python manage.py db upgrade
 ```
 
@@ -122,6 +120,10 @@ you can verify the models exist in postgres like so:
 psql -d neuhatch
 neuhatch=# \dt
 ```
+
+If you need to make a change to the model(s), you _MUST_ write an associated
+migration script. See the [migrations documentation](migrations/README.md) for
+more information on how to go about this.
 
 # run
 
