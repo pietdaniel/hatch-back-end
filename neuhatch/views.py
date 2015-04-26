@@ -42,6 +42,7 @@ def users():
 
 @app.route("/oauth")
 def oauth():
+    """Start the oauth login process."""
     if not current_user.is_anonymous():
         return redirect(url_for('user'))
 
@@ -61,6 +62,9 @@ def oauth():
 
 @app.route('/callback')
 def callback():
+    """Oauth callback.
+    Twitter will redirect the user to this route if they authenticate.
+    """
     try:
         request_token = session['request_token']
         verifier = request.args.get('oauth_verifier')
@@ -90,9 +94,7 @@ def callback():
 @app.route('/user')
 @login_required
 def user():
-    """
-    Return the logged in user.
-    """
+    """Return the logged in user."""
     return utils.json_response({
         'id': current_user.id,
         'username': current_user.username
@@ -107,7 +109,8 @@ def search_for_tweets(query, max_results=1000):
         query - String. A search query.
         max_results - Integer. Max number of tweets to return.
 
-    Returns: a list of Tweets."""
+    Returns: a list of Tweets.
+    """
     api = utils.get_user_api(current_user)
     COUNT = 100  # Tweets per page
     results = []
@@ -137,13 +140,41 @@ def search():
 @crossdomain(origin='*')
 @login_required
 def search_csv():
-    """Returns a CSV export of a search query."""
+    """Return a CSV export of a search query."""
     query = request.args.get('q')
+    # TODO: write rows directly to the response (instead of to StringIO)
     stringbuffer = StringIO()
-    writer = unicodecsv.writer(stringbuffer, encoding='utf-8')
+    fieldnames = [
+        'author', 'contributors', 'coordinates',
+        'created_at', 'destroy', 'entities', 'favorite',
+        'favorite_count', 'favorited', 'geo', 'id', 'id_str',
+        'in_reply_to_screen_name', 'in_reply_to_status_id',
+        'in_reply_to_status_id_str', 'in_reply_to_user_id',
+        'in_reply_to_user_id_str', 'lang', 'metadata', 'parse',
+        'parse_list', 'place', 'possibly_sensitive', 'retweet',
+        'retweet_count', 'retweeted', 'retweeted_status', 'retweets',
+        'source', 'source_url', 'text', 'truncated', 'user'
+    ]
+    writer = unicodecsv.DictWriter(
+        stringbuffer, fieldnames, extrasaction='ignore', encoding='utf-8')
+    writer.writeheader()
     for tweet in search_for_tweets(query, max_results=1000):
-        # TODO: add row fields
-        writer.writerow([tweet.text])
+        writer.writerow(tweet.__dict__)
+        # writer.writerow([
+        #     tweet.author, tweet.contributors, tweet.coordinates,
+        #     tweet.created_at, tweet.destroy, tweet.entities,
+        #     tweet.favorite, tweet.favorite_count, tweet.favorited,
+        #     tweet.geo, tweet.id_str, tweet.in_reply_to_screen_name,
+        #     tweet.in_reply_to_status_id,
+        #     tweet.in_reply_to_status_id_str,
+        #     tweet.in_reply_to_user_id, tweet.in_reply_to_user_id_str,
+        #     tweet.lang, tweet.metadata, tweet.parse, tweet.parse_list,
+        #     tweet.place, tweet.possibly_sensitive, tweet.retweet,
+        #     tweet.retweet_count, tweet.retweeted,
+        #     tweet.retweeted_status, tweet.retweets, tweet.source,
+        #     tweet.source_url, tweet.text, tweet.truncated, tweet.user
+        # ])
     response = make_response(stringbuffer.getvalue())
     response.mimetype = 'text/csv'
+    stringbuffer.close()
     return response

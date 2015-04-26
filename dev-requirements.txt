@@ -1,2 +1,3 @@
 nose
 Flask-Testing
+fabric
