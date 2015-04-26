@@ -10,7 +10,6 @@ import sys
 
 from neuhatch import app, db, login_manager, utils
 from neuhatch.models import User
-from neuhatch.crossdomain import crossdomain
 
 
 """This module contains the application's routes exposed over HTTP."""
@@ -120,7 +119,6 @@ def search_for_tweets(query, max_results=1000):
     return results
 
 @app.route('/search')
-@crossdomain(origin='*')
 @login_required
 def search():
     """Return search results (Tweets) from Twitter for the given query.
@@ -132,12 +130,13 @@ def search():
     """
     query = request.args.get('q')
     return utils.json_response([
-        tweet._json for tweet in search_for_tweets(query, max_results=1000)
+        tweet._json for tweet in search_for_tweets(query, max_results=100)
     ])
 
 
+
+
 @app.route('/search.csv')
-@crossdomain(origin='*')
 @login_required
 def search_csv():
     """Return a CSV export of a search query."""
@@ -146,7 +145,7 @@ def search_csv():
     stringbuffer = StringIO()
     fieldnames = [
         'author', 'contributors', 'coordinates',
-        'created_at', 'destroy', 'entities', 'favorite',
+        'created_at', 'destroy', 'favorite',
         'favorite_count', 'favorited', 'geo', 'id', 'id_str',
         'in_reply_to_screen_name', 'in_reply_to_status_id',
         'in_reply_to_status_id_str', 'in_reply_to_user_id',
@@ -158,7 +157,17 @@ def search_csv():
     writer = unicodecsv.DictWriter(
         stringbuffer, fieldnames, extrasaction='ignore', encoding='utf-8')
     writer.writeheader()
-    for tweet in search_for_tweets(query, max_results=1000):
+
+    for tweet in search_for_tweets(query, max_results=100):
+
+        del tweet.__dict__['entities']
+
+        author = tweet.__dict__['author']
+        tweet.__dict__['author'] = "%s, %s" % (author.screen_name, author.name)
+
+        user = tweet.__dict__['user']
+        tweet.__dict__['user'] = "%s, %s" % (user.screen_name, author.name)
+
         writer.writerow(tweet.__dict__)
         # writer.writerow([
         #     tweet.author, tweet.contributors, tweet.coordinates,
