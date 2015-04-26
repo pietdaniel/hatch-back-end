@@ -101,7 +101,7 @@ def user():
 
 
 @login_required
-def search_for_tweets(query, max_results=1000):
+def search_for_tweets(query, max_results=1000, per_page=10):
     """Search for Tweets matching the given query.
 
     Args:
@@ -111,10 +111,8 @@ def search_for_tweets(query, max_results=1000):
     Returns: a list of Tweets.
     """
     api = utils.get_user_api(current_user)
-    COUNT = 100  # Tweets per page
     results = []
-    for page in tweepy.Cursor(api.search, q=query, count=COUNT).pages(
-            max_results/COUNT):
+    for page in tweepy.Cursor(api.search, q=query, count=per_page).pages(max_results / per_page):
         results.extend(page)
     return results
 
@@ -129,12 +127,8 @@ def search():
         max_results -- Integer, the most tweets to return
     """
     query = request.args.get('q')
-    return utils.json_response([
-        tweet._json for tweet in search_for_tweets(query, max_results=100)
-    ])
-
-
-
+    return utils.json_response(
+        [tweet._json for tweet in search_for_tweets(query, max_results=100)])
 
 @app.route('/search.csv')
 @login_required
@@ -142,6 +136,11 @@ def search_csv():
     """Return a CSV export of a search query."""
     query = request.args.get('q')
     # TODO: write rows directly to the response (instead of to StringIO)
+    response = make_response(build_csv(query))
+    response.mimetype = 'text/csv'
+    return response
+
+def build_csv(query):
     stringbuffer = StringIO()
     fieldnames = [
         'author', 'contributors', 'coordinates',
@@ -154,36 +153,18 @@ def search_csv():
         'retweet_count', 'retweeted', 'retweeted_status', 'retweets',
         'source', 'source_url', 'text', 'truncated', 'user'
     ]
-    writer = unicodecsv.DictWriter(
-        stringbuffer, fieldnames, extrasaction='ignore', encoding='utf-8')
+    writer = unicodecsv.DictWriter(stringbuffer, fieldnames, extrasaction='ignore', encoding='utf-8')
     writer.writeheader()
 
     for tweet in search_for_tweets(query, max_results=100):
-
         del tweet.__dict__['entities']
-
         author = tweet.__dict__['author']
-        tweet.__dict__['author'] = "%s, %s" % (author.screen_name, author.name)
-
+        tweet.__dict__['author'] = "%s (@%s)" % (author.name, author.screen_name)
         user = tweet.__dict__['user']
-        tweet.__dict__['user'] = "%s, %s" % (user.screen_name, author.name)
-
+        tweet.__dict__['user'] = "%s (@%s)" % (user.name, user.screen_name)
         writer.writerow(tweet.__dict__)
-        # writer.writerow([
-        #     tweet.author, tweet.contributors, tweet.coordinates,
-        #     tweet.created_at, tweet.destroy, tweet.entities,
-        #     tweet.favorite, tweet.favorite_count, tweet.favorited,
-        #     tweet.geo, tweet.id_str, tweet.in_reply_to_screen_name,
-        #     tweet.in_reply_to_status_id,
-        #     tweet.in_reply_to_status_id_str,
-        #     tweet.in_reply_to_user_id, tweet.in_reply_to_user_id_str,
-        #     tweet.lang, tweet.metadata, tweet.parse, tweet.parse_list,
-        #     tweet.place, tweet.possibly_sensitive, tweet.retweet,
-        #     tweet.retweet_count, tweet.retweeted,
-        #     tweet.retweeted_status, tweet.retweets, tweet.source,
-        #     tweet.source_url, tweet.text, tweet.truncated, tweet.user
-        # ])
-    response = make_response(stringbuffer.getvalue())
-    response.mimetype = 'text/csv'
-    stringbuffer.close()
-    return response
+
+    try:
+      return stringbuffer.getvalue()
+    finally:
+      stringbuffer.close()
