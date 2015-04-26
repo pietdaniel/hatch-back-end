@@ -1,43 +1,22 @@
-from flask import redirect, session, request, url_for, make_response
-from flask.ext.login import (
-    current_user, logout_user, login_user, login_required)
-import tweepy
-import unicodecsv
-
-import csv
-from cStringIO import StringIO
-import sys
-
 from neuhatch import app, db, login_manager, utils
 from neuhatch.models import User
-
+from flask import redirect, session, request, url_for, make_response
+from flask.ext.login import current_user, logout_user, login_user, login_required
+from cStringIO import StringIO
+import tweepy, unicodecsv, csv, sys
 
 """This module contains the application's routes exposed over HTTP."""
-
 
 @login_manager.user_loader
 def load_user(userid):
     """Return a user by their id. Required by flask.ext.login."""
     return User.query.filter_by(id=userid).first()
 
-
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return utils.json_response({'message': 'logout succesful'})
-
-
-@app.route("/users")
-@login_required
-def users():
-    """Return a list of all users."""
-    users = User.query.all()
-    out = []
-    for user in users:
-        out.append(user.serialize())
-    return utils.json_response(out)
-
 
 @app.route("/oauth")
 def oauth():
@@ -54,10 +33,7 @@ def oauth():
     except tweepy.TweepError as e:
         return 'Failed to get request token %s' % e
     except Exception as e:
-        # todo error handling
-        print e
-        return str(sys.exc_info())
-
+        return 'Failed with error %s' % e
 
 @app.route('/callback')
 def callback():
@@ -68,10 +44,9 @@ def callback():
         request_token = session['request_token']
         verifier = request.args.get('oauth_verifier')
         del session['request_token']
-    except:
+    except Exception as e:
         print("error getting auth verifier or request_token")
-        # todo appropriate error handling
-        return str(sys.exc_info())
+        return 'Failed with error %s' % e
 
     username, key, secret = utils.verify_api(request_token, verifier)
 
@@ -89,7 +64,6 @@ def callback():
 
     return redirect(app.config['FRONTEND'], code=302)
 
-
 @app.route('/user')
 @login_required
 def user():
@@ -98,7 +72,6 @@ def user():
         'id': current_user.id,
         'username': current_user.username
     })
-
 
 @login_required
 def search_for_tweets(query, max_results=1000, per_page=10):
@@ -135,7 +108,6 @@ def search():
 def search_csv():
     """Return a CSV export of a search query."""
     query = request.args.get('q')
-    # TODO: write rows directly to the response (instead of to StringIO)
     response = make_response(build_csv(query))
     response.mimetype = 'text/csv'
     return response
