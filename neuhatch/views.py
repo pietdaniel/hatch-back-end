@@ -16,7 +16,7 @@ def load_user(userid):
 @login_required
 def logout():
     logout_user()
-    return utils.json_response({'message': 'logout succesful'})
+    return redirect(app.config['FRONTEND'], code=302)
 
 @app.route("/oauth")
 def oauth():
