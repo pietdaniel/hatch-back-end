@@ -131,9 +131,9 @@ def search():
         max_results -- Integer, the most tweets to return
     """
     query = request.args.get('q')
-    # TODO: This only works for multiples of 100 up to 1000. Values other
-    # than this can't be requested from the UI.
-    max_results = request.args.get('max_results', default=100, type=int)
+    max_results_param = request.args.get('max_results', default=100, type=int)
+    max_results_multiplier = min(max_results_param/100, 10)
+    max_results = max_results_multiplier*100
 
     return utils.json_response([
         tweet._json for tweet in search_for_tweets(query, max_results)
@@ -147,9 +147,9 @@ def search_csv():
     """Return a CSV export of a search query."""
     query = request.args.get('q')
 
-    # TODO: This only works for multiples of 100 up to 1000. Values other
-    # than this can't be requested from the UI.
-    max_results = request.args.get('max_results', default=100, type=int)
+    max_results_param = request.args.get('max_results', default=100, type=int)
+    max_results_multiplier = min(max_results_param/100, 10)
+    max_results = max_results_multiplier*100
 
     # TODO: write rows directly to the response (instead of to StringIO)
     stringbuffer = StringIO()
