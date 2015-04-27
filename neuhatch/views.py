@@ -131,8 +131,14 @@ def search():
         max_results -- Integer, the most tweets to return
     """
     query = request.args.get('q')
+
+    if request.args.get('max_results') is None:
+        max_results = 100
+    else:
+        max_results = float(request.args.get('max_results'))
+
     return utils.json_response([
-        tweet._json for tweet in search_for_tweets(query, max_results=1000)
+        tweet._json for tweet in search_for_tweets(query, max_results)
     ])
 
 
