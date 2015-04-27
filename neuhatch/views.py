@@ -131,6 +131,8 @@ def search():
         max_results -- Integer, the most tweets to return
     """
     query = request.args.get('q')
+    # TODO: This only works for multiples of 100 up to 1000. Values other
+    # than this can't be requested from the UI.
     max_results = request.args.get('max_results', default=100, type=int)
 
     return utils.json_response([
@@ -144,6 +146,9 @@ def search():
 def search_csv():
     """Return a CSV export of a search query."""
     query = request.args.get('q')
+
+    # TODO: This only works for multiples of 100 up to 1000. Values other
+    # than this can't be requested from the UI.
     max_results = request.args.get('max_results', default=100, type=int)
 
     # TODO: write rows directly to the response (instead of to StringIO)
@@ -162,7 +167,7 @@ def search_csv():
     writer = unicodecsv.DictWriter(
         stringbuffer, fieldnames, extrasaction='ignore', encoding='utf-8')
     writer.writeheader()
-    for tweet in search_for_tweets(query, max_results=1000):
+    for tweet in search_for_tweets(query, max_results):
         writer.writerow(tweet.__dict__)
         # writer.writerow([
         #     tweet.author, tweet.contributors, tweet.coordinates,
