@@ -5,22 +5,24 @@ from cStringIO import StringIO
 from neuhatch import app, db, login_manager, utils
 from neuhatch.models import User
 
-import sys
 import tweepy
 import unicodecsv
 
 """This module contains the application's routes exposed over HTTP."""
+
 
 @login_manager.user_loader
 def load_user(userid):
     """Return a user by their id. Required by flask.ext.login."""
     return User.query.filter_by(id=userid).first()
 
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(app.config['FRONTEND'], code=302)
+
 
 @app.route("/oauth")
 def oauth():
@@ -38,6 +40,7 @@ def oauth():
         return 'Failed to get request token %s' % e
     except Exception as e:
         return 'Failed with error %s' % e
+
 
 @app.route('/callback')
 def callback():
@@ -68,6 +71,7 @@ def callback():
 
     return redirect(app.config['FRONTEND'], code=302)
 
+
 @app.route('/user')
 @login_required
 def user():
@@ -76,6 +80,7 @@ def user():
         'id': current_user.id,
         'username': current_user.username
     })
+
 
 @login_required
 def search_for_tweets(query, max_results=1000, per_page=10):
@@ -89,7 +94,12 @@ def search_for_tweets(query, max_results=1000, per_page=10):
     """
     api = utils.get_user_api(current_user)
     results = []
-    for page in tweepy.Cursor(api.search, q=query, count=per_page).pages(max_results / per_page):
+    for page in tweepy.Cursor(
+            api.search,
+            q=query,
+            count=per_page).pages(
+            max_results /
+            per_page):
         results.extend(page)
     return results
 
@@ -109,9 +119,9 @@ def search():
     max_results_multiplier = min(max_results_param / 100, 10)
     max_results = max_results_multiplier * 100
 
-    return utils.json_response([
-        tweet._json for tweet in search_for_tweets(query, max_results=max_results)
-    ])
+    return utils.json_response(
+        [tweet._json for tweet in search_for_tweets(query, max_results=max_results)])
+
 
 @app.route('/search.csv')
 @login_required
@@ -122,8 +132,9 @@ def search_csv():
     response.mimetype = 'text/csv'
     return response
 
+
 def build_csv(query):
-    ## TODO: write rows directly to the response (instead of to StringIO)
+    # TODO: write rows directly to the response (instead of to StringIO)
     max_results_param = request.args.get('max_results', default=100, type=int)
     max_results_multiplier = min(max_results_param / 100, 10)
     max_results = max_results_multiplier * 100
@@ -140,18 +151,23 @@ def build_csv(query):
         'retweet_count', 'retweeted', 'retweeted_status', 'retweets',
         'source', 'source_url', 'text', 'truncated', 'user'
     ]
-    writer = unicodecsv.DictWriter(stringbuffer, fieldnames, extrasaction='ignore', encoding='utf-8')
+    writer = unicodecsv.DictWriter(
+        stringbuffer,
+        fieldnames,
+        extrasaction='ignore',
+        encoding='utf-8')
     writer.writeheader()
 
     for tweet in search_for_tweets(query, max_results=max_results):
         del tweet.__dict__['entities']
         author = tweet.__dict__['author']
-        tweet.__dict__['author'] = "%s (@%s)" % (author.name, author.screen_name)
+        tweet.__dict__['author'] = "%s (@%s)" % (
+            author.name, author.screen_name)
         user = tweet.__dict__['user']
         tweet.__dict__['user'] = "%s (@%s)" % (user.name, user.screen_name)
         writer.writerow(tweet.__dict__)
 
     try:
-      return stringbuffer.getvalue()
+        return stringbuffer.getvalue()
     finally:
-      stringbuffer.close()
+        stringbuffer.close()
