@@ -1,5 +1,5 @@
 from neuhatch import db
-from sqlalchemy.dialects.postgresql import JSON
+
 
 class User(db.Model):
     __tablename__ = "users"
@@ -28,9 +28,9 @@ class User(db.Model):
 
     def serialize(self):
         return {
-                "id": self.id,
-                "username" : self.username
-                }
+            "id": self.id,
+            "username": self.username
+        }
 
     def __repr__(self):
         return '<id {}>.<username {}>'.format(self.id, self.username)

@@ -2,8 +2,8 @@ from flask import Flask, jsonify
 from werkzeug.exceptions import default_exceptions
 from werkzeug.exceptions import HTTPException
 from flask.ext.sqlalchemy import SQLAlchemy
-
 from flask.ext.login import LoginManager
+
 
 def make_json_app(import_name, **kwargs):
     """
@@ -23,7 +23,10 @@ def make_json_app(import_name, **kwargs):
 
     def make_json_error(ex):
         response = jsonify(message=str(ex))
-        response.status_code = (ex.code if isinstance(ex, HTTPException) else 500)
+        response.status_code = (
+            ex.code if isinstance(
+                ex,
+                HTTPException) else 500)
         return response
 
     for code in default_exceptions.iterkeys():

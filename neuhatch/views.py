@@ -1,9 +1,13 @@
+from flask import redirect, session, request, url_for, make_response
+from flask.ext.login import (
+    current_user, logout_user, login_user, login_required)
+from cStringIO import StringIO
 from neuhatch import app, db, login_manager, utils
 from neuhatch.models import User
-from flask import redirect, session, request, url_for, make_response
-from flask.ext.login import current_user, logout_user, login_user, login_required
-from cStringIO import StringIO
-import tweepy, unicodecsv, csv, sys
+
+import sys
+import tweepy
+import unicodecsv
 
 """This module contains the application's routes exposed over HTTP."""
 
@@ -89,6 +93,7 @@ def search_for_tweets(query, max_results=1000, per_page=10):
         results.extend(page)
     return results
 
+
 @app.route('/search')
 @login_required
 def search():
@@ -100,8 +105,13 @@ def search():
         max_results -- Integer, the most tweets to return
     """
     query = request.args.get('q')
-    return utils.json_response(
-        [tweet._json for tweet in search_for_tweets(query, max_results=100)])
+    max_results_param = request.args.get('max_results', default=100, type=int)
+    max_results_multiplier = min(max_results_param / 100, 10)
+    max_results = max_results_multiplier * 100
+
+    return utils.json_response([
+        tweet._json for tweet in search_for_tweets(query, max_results=max_results)
+    ])
 
 @app.route('/search.csv')
 @login_required
@@ -113,6 +123,11 @@ def search_csv():
     return response
 
 def build_csv(query):
+    ## TODO: write rows directly to the response (instead of to StringIO)
+    max_results_param = request.args.get('max_results', default=100, type=int)
+    max_results_multiplier = min(max_results_param / 100, 10)
+    max_results = max_results_multiplier * 100
+
     stringbuffer = StringIO()
     fieldnames = [
         'author', 'contributors', 'coordinates',
@@ -128,7 +143,7 @@ def build_csv(query):
     writer = unicodecsv.DictWriter(stringbuffer, fieldnames, extrasaction='ignore', encoding='utf-8')
     writer.writeheader()
 
-    for tweet in search_for_tweets(query, max_results=100):
+    for tweet in search_for_tweets(query, max_results=max_results):
         del tweet.__dict__['entities']
         author = tweet.__dict__['author']
         tweet.__dict__['author'] = "%s (@%s)" % (author.name, author.screen_name)

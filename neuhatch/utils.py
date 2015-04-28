@@ -1,9 +1,10 @@
 from flask import Response
-import tweepy, sys, json
-from flask.ext.login import logout_user, logout_user, login_required, current_user
-from neuhatch import app, db, login_manager
+import tweepy
+import json
+from neuhatch import app
 
-def get_base_auth(callback = None):
+
+def get_base_auth(callback=None):
     return tweepy.OAuthHandler(
         app.config['CONSUMER_KEY'],
         app.config['CONSUMER_SECRET'],
@@ -28,12 +29,14 @@ def verify_api(request_token, verifier):
     username = api.me().screen_name
     return (username, key, secret)
 
+
 def get_user_api(user):
     auth = get_base_auth()
     key = user.access_token
     secret = user.access_token_secret
     auth.set_access_token(key, secret)
     return tweepy.API(auth)
+
 
 def json_response(data):
     out_json = json.dumps(data)
