@@ -122,7 +122,6 @@ def search():
     return utils.json_response(
         [tweet._json for tweet in search_for_tweets(query, max_results=max_results)])
 
-
 @app.route('/search.csv')
 @login_required
 def search_csv():
