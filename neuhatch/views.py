@@ -119,6 +119,7 @@ def search_for_tweets(query, max_results=1000):
         results.extend(page)
     return results
 
+
 @app.route('/search')
 @crossdomain(origin='*')
 @login_required
